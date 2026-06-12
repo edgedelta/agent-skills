@@ -5,19 +5,21 @@ SKILL.md-compatible tools), built on the [`edx` CLI](https://github.com/edgedelt
 
 ## See it in action
 
-Schema discovery before querying (the **ed-logs** flow — find field values,
-then search):
+Ask your agent a root-cause question and the skills drive the investigation.
+Here is what it looks like in Claude Code — surging error patterns found,
+onset quantified, verdict delivered (**ed-investigate**):
 
-![discovery flow](assets/skill-discovery.gif)
+![root-cause investigation in Claude Code](assets/skill-rca.gif)
 
-Incident triage (the **ed-investigate** flow — recent alert events, then
-surging negative log patterns):
+And tracing a fleet regression back to the offending pipeline config change,
+with the rollback command ready (**ed-pipelines**):
 
-![investigate flow](assets/skill-investigate.gif)
+![config-change root cause in Claude Code](assets/skill-config-rca.gif)
 
-Clips are generated with [vhs](https://github.com/charmbracelet/vhs) from the
-tape scripts in [`demo/`](demo/) — re-record with `vhs demo/<name>.tape`
-(requires an authenticated `edx`; no credentials appear on screen).
+The `edx` outputs in these clips are from real investigations against a live
+org, replayed with scripted timing to keep the clips short (see
+[`demo/`](demo/)). Re-record with `vhs demo/<name>.tape` — no credentials
+appear on screen.
 
 ## Skills
 
