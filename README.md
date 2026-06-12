@@ -3,6 +3,22 @@
 Edge Delta skills for AI agents (Claude Code, Cursor, Copilot and other
 SKILL.md-compatible tools), built on the [`edx` CLI](https://github.com/edgedelta/edx).
 
+## See it in action
+
+Schema discovery before querying (the **ed-logs** flow — find field values,
+then search):
+
+![discovery flow](assets/skill-discovery.gif)
+
+Incident triage (the **ed-investigate** flow — recent alert events, then
+surging negative log patterns):
+
+![investigate flow](assets/skill-investigate.gif)
+
+Clips are generated with [vhs](https://github.com/charmbracelet/vhs) from the
+tape scripts in [`demo/`](demo/) — re-record with `vhs demo/<name>.tape`
+(requires an authenticated `edx`; no credentials appear on screen).
+
 ## Skills
 
 | Skill | Description |
