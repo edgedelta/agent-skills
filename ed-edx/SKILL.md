@@ -67,6 +67,11 @@ Re-run `edx auth login` with a token from Admin > API Tokens in the web app.
 - **Confirmations**: destructive commands (`deploy`, `delete`) prompt; add
   `--yes` in non-interactive contexts.
 - **Limits**: default search limit is 20; raise with `--limit` (max 1000).
+- **Query fields use dot paths**: filter with `field.name:"value"` (e.g.
+  `event.domain:"Monitor"`, `service.name:"api"`) even though the JSON response
+  renders the same field with underscores (e.g. `event_domain`). Filter on the
+  dotted form; read the underscore form. Confirm valid values with
+  `edx facets options --scope <scope> --facet <field>`.
 
 ## Escape Hatch
 
@@ -86,4 +91,5 @@ edx api GET /rehydration --param limit=10
 | 401 Invalid authentication token | `edx auth login` with a valid token + matching org ID |
 | 404 on a path | Check the org ID; try `edx api` with the full /v1 path |
 | Empty search results | Widen `--lookback`; verify fields with `edx facets options` |
+| 500 / "Failed to query ..." | Server-side error, not your query. Retry the same command; if it persists, narrow the time range. Do NOT keep editing the query - widening `--lookback` will not fix a 5xx. |
 | Timeout on large queries | Narrow the time range or add `--timeout 120s` |
