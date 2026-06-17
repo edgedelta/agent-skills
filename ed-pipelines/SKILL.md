@@ -63,7 +63,7 @@ edx fleet deployments <conf-id>
 ## Investigating Config Changes (Who Broke It?)
 
 ```bash
-edx pipelines history <conf-id> --output table --columns version,description,creator,created
+edx pipelines history <conf-id> --output table --columns timestamp,author,status,description
 ```
 
 Correlate the deploy timestamps with the incident start. Roll back by

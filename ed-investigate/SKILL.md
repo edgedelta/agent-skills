@@ -29,7 +29,7 @@ The `edx` CLI must be installed and authenticated. See the **ed-edx** skill.
 
 ```bash
 edx events search --from <start> --to <end> --output table
-edx events search -q 'event.domain:"Monitor Alerts"' --lookback 2h
+edx events search -q 'event.domain:"Monitor"' --lookback 2h
 ```
 
 Note affected services and event types. Monitor alerts carry the monitor ID:
@@ -61,7 +61,7 @@ Identify exactly when the regression started - this timestamp drives step 5.
 
 ```bash
 edx service-map --lookback 1h
-edx traces search -q 'status.code:"ERROR" AND service.name:"<svc>"' --include-children
+edx traces search -q 'status.code:"500" AND service.name:"<svc>"' --include-children
 ```
 
 Find the deepest failing span: that service/dependency is the likely root
@@ -72,7 +72,7 @@ cause; everything upstream is blast radius.
 Root causes are usually changes. Check what changed right before onset:
 
 ```bash
-edx pipelines history <conf-id> --output table --columns version,description,creator,created
+edx pipelines history <conf-id> --output table --columns timestamp,author,status,description
 edx fleet deployments
 ```
 
