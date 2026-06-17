@@ -18,24 +18,33 @@ metrics, traces, events, monitors) and AI Teammate (connectors, activity).
 ## Install
 
 ```bash
+brew install edgedelta/tap/edx       # macOS/Linux
+# or
 go install github.com/edgedelta/edx@latest
-# verify
-edx version
+edx version                          # verify
 ```
 
 ## Auth
 
+Two methods — pick one:
+
 ```bash
+# Token auth (good for CI/automation):
 edx auth login --token <api-token> --org-id <org-id>   # saved to ~/.config/edx/config.yaml
-edx auth status                                        # verifies the token against the API
+
+# OAuth (interactive browser login; org is read from the token, refreshed automatically):
+edx auth login --oauth
+
+edx auth status                                        # verifies credentials against the API
 ```
 
 Environment variables override the config file: `ED_API_TOKEN`, `ED_ORG_ID`,
-`ED_API_URL`. Multiple orgs: `edx auth login --profile <name> ...` then
-`edx --profile <name> ...`.
+`ED_ENV` (`prod` (default), `staging` or `local` — selects the API and AI
+service hosts together). Multiple orgs/envs: `edx auth login --profile <name> ...`
+then `edx --profile <name> ...`.
 
-If commands fail with 401, the token is invalid or does not match the org ID.
-Re-run `edx auth login` with a token from Admin > API Tokens in the web app.
+If commands fail with 401, the credentials are invalid or do not match the org.
+Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
 
 ## Command Map
 

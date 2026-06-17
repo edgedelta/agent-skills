@@ -39,14 +39,19 @@ appear on screen.
 ## Setup edx
 
 ```bash
-go install github.com/edgedelta/edx@latest
+brew install edgedelta/tap/edx          # or: go install github.com/edgedelta/edx@latest
+
+# Token auth (good for CI):
 edx auth login --token <api-token> --org-id <org-id>
+# Or OAuth (browser login; org is read from the token):
+edx auth login --oauth
+
 edx auth status
 ```
 
 API tokens are created in the Edge Delta web app under **Admin → API Tokens**.
-Environment variables `ED_API_TOKEN`, `ED_ORG_ID` and `ED_API_URL` override
-the config file - useful in CI.
+Environment variables `ED_API_TOKEN`, `ED_ORG_ID` and `ED_ENV` (`prod`,
+`staging` or `local`) override the config file - useful in CI.
 
 ## Install Skills
 
