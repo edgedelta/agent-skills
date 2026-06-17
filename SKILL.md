@@ -71,7 +71,8 @@ Use this order for scoped commands:
 ## Auth
 
 ```bash
-edx auth login --token <api-token> --org-id <org-id>
+edx auth login --token <api-token> --org-id <org-id>   # token auth
+edx auth login --oauth                                 # or OAuth (browser; org from token)
 edx auth status
 ```
 
