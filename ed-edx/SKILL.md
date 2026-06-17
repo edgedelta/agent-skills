@@ -13,7 +13,8 @@ metadata:
 
 `edx` is the canonical way for agents to interact with Edge Delta: Pipeline
 (fleet management, configs, live capture), Observability (logs, patterns,
-metrics, traces, events, monitors) and AI Teammate (connectors, activity).
+metrics, traces, events, monitors) and AI Teammate (issues, threads, channels,
+teammates, connectors, activity).
 
 ## Install
 
@@ -26,14 +27,14 @@ edx version                          # verify
 
 ## Auth
 
-Two methods — pick one:
+`edx auth login` uses **OAuth by default** — it opens a browser to log in, reads
+your org from the token, and refreshes the token automatically:
 
 ```bash
-# Token auth (good for CI/automation):
-edx auth login --token <api-token> --org-id <org-id>   # saved to ~/.config/edx/config.yaml
+edx auth login                                         # OAuth (default), saved to ~/.config/edx/config.yaml
 
-# OAuth (interactive browser login; org is read from the token, refreshed automatically):
-edx auth login --oauth
+# For CI/automation, use a static API token instead (requires --org-id):
+edx auth login --token <api-token> --org-id <org-id>
 
 edx auth status                                        # verifies credentials against the API
 ```
@@ -44,7 +45,7 @@ service hosts together). Multiple orgs/envs: `edx auth login --profile <name> ..
 then `edx --profile <name> ...`.
 
 If commands fail with 401, the credentials are invalid or do not match the org.
-Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
+Re-run `edx auth login` (OAuth), or `--token` with a token from Admin > API Tokens.
 
 ## Command Map
 
@@ -62,7 +63,7 @@ Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
 | Health | `edx health components`, `edx health problems` |
 | Dashboards | `edx dashboards list/get` |
 | Schema | `edx facets keys/options/list` |
-| AI Teammate | `edx ai connectors ...`, `edx ai activity` |
+| AI Teammate | `edx ai issues ...`, `edx ai threads ...`, `edx ai channels ...`, `edx ai agents ...`, `edx ai connectors ...`, `edx ai activity` |
 | Ingestion | `edx ingest endpoints`, `edx ingest token` |
 | Raw API | `edx api <METHOD> <path>` |
 

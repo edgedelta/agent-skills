@@ -34,17 +34,16 @@ appear on screen.
 | [ed-monitors](ed-monitors/SKILL.md) | Create, manage and resolve monitors |
 | [ed-pipelines](ed-pipelines/SKILL.md) | Fleet management, config changes, deployments, live capture |
 | [ed-investigate](ed-investigate/SKILL.md) | Cross-signal incident investigation workflow |
-| [ed-ai-teammate](ed-ai-teammate/SKILL.md) | AI Teammate connectors and activity |
+| [ed-ai-teammate](ed-ai-teammate/SKILL.md) | AI Teammate issues, threads, channels, teammates, connectors and activity |
 
 ## Setup edx
 
 ```bash
 brew install edgedelta/tap/edx          # or: go install github.com/edgedelta/edx@latest
 
-# Token auth (good for CI):
+edx auth login                          # OAuth in your browser (default; org read from the token)
+# For CI/automation, use a static API token instead:
 edx auth login --token <api-token> --org-id <org-id>
-# Or OAuth (browser login; org is read from the token):
-edx auth login --oauth
 
 edx auth status
 ```
