@@ -55,12 +55,14 @@ reliable way is to search logs for a distinctive token from the signature
 edx logs search -q '"connection refused"' --lookback 1h
 ```
 
-`edx patterns samples` also exists, but `--param pattern=` must be the exact
-signature and should be paired with a service/`-q` scope; without a precise
-match it returns recent unscoped lines rather than samples of that pattern:
+`edx patterns samples` returns raw lines too, but it filters only by `-q` and
+time - the `--param pattern=` value is currently ignored by the backend (the
+same lines come back regardless), so it cannot isolate a single pattern. Use it
+to pull recent lines for a service, and use the `logs search` token approach
+above to read lines for one specific pattern:
 
 ```bash
-edx patterns samples -q 'service.name:"api"' --param pattern='<exact signature from patterns list>'
+edx patterns samples -q 'service.name:"api"' --lookback 1h
 ```
 
 ## Interpretation Guide
