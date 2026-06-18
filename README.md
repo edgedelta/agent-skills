@@ -64,6 +64,9 @@ npx skills add edgedelta/agent-skills \
   --skill ed-traces \
   --skill ed-monitors \
   --skill ed-pipelines \
+  --skill ed-events \
+  --skill ed-investigate \
+  --skill ed-ai-teammate \
   --full-depth -y
 ```
 
