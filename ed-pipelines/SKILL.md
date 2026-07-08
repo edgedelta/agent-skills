@@ -45,18 +45,21 @@ edx health problems                   # components currently failing
 edx pipelines get <conf-id> > pipeline.json
 jq -r .content pipeline.json > pipeline.yaml
 
-# 2. Edit pipeline.yaml
+# 2. Edit pipeline.yaml (to develop the transform itself, see the ed-pipeline-tuning skill)
 
-# 3. Validate before saving
+# 3. Dry-run the change on sample logs before saving (offline, no deploy)
+edx pipelines test ottl <conf-id> --file samples.jsonl --statements '<ottl>'
+
+# 4. Validate before saving
 edx pipelines validate --file pipeline.yaml
 
-# 4. Save a new version with a meaningful description
+# 5. Save a new version with a meaningful description
 edx pipelines save <conf-id> --file pipeline.yaml -d "mask PII in checkout logs"
 
-# 5. Deploy the version from the save response
+# 6. Deploy the version from the save response
 edx pipelines deploy <conf-id> <version> --yes
 
-# 6. Watch the rollout
+# 7. Watch the rollout
 edx fleet deployments <conf-id>
 ```
 

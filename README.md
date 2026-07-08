@@ -33,6 +33,7 @@ appear on screen.
 | [ed-events](ed-events/SKILL.md) | Events: anomalies, monitor alerts, K8s events |
 | [ed-monitors](ed-monitors/SKILL.md) | Create, manage and resolve monitors |
 | [ed-pipelines](ed-pipelines/SKILL.md) | Fleet management, config changes, deployments, live capture |
+| [ed-pipeline-tuning](ed-pipeline-tuning/SKILL.md) | Improve data quality: parse, structure, enrich, mask, roll up to metrics/patterns |
 | [ed-investigate](ed-investigate/SKILL.md) | Cross-signal incident investigation workflow |
 | [ed-ai-teammate](ed-ai-teammate/SKILL.md) | AI Teammate connectors and activity |
 
@@ -64,6 +65,7 @@ npx skills add edgedelta/agent-skills \
   --skill ed-traces \
   --skill ed-monitors \
   --skill ed-pipelines \
+  --skill ed-pipeline-tuning \
   --skill ed-events \
   --skill ed-investigate \
   --skill ed-ai-teammate \
