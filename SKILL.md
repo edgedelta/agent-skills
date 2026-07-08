@@ -65,7 +65,7 @@ Use this order for scoped commands:
 | Recent anomalies | `edx events search -q 'event.type:"pattern_anomaly"'` |
 | List monitors | `edx monitors list --output table` |
 | List pipelines | `edx pipelines list --output table` |
-| Live capture | `edx capture start <conf-id> --duration 2m` |
+| Live capture | `edx capture start <pipeline-id> --duration 2m` |
 | Check auth | `edx auth status` |
 
 ## Auth
