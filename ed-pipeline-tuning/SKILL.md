@@ -119,13 +119,35 @@ malformed errors the statement (skipped at runtime, so the log passes through
 unparsed). OTTL string literals need doubled backslashes (`\\b` in YAML = `\b`
 regex). `EDXCoalesce(x, "")` safely treats a missing/nil field as empty.
 
-## Where to put processors
+## Where to put processors (pre vs post — avoid the middle)
 
-- **Per-source** multiprocessor (e.g. `<source>_multiprocessor`): format-specific
-  parsing, since each source has one known format. Precise, and shows up per input
-  in the UI.
-- **Shared** multiprocessor (all sources converge): common enrichment (severity
-  fallback, PII masking, field hygiene) applied once.
+A pipeline has two natural processing stages. Put each processor in the one that
+matches its scope; a processor that sits in neither is a smell.
+
+```
+input ──▶ [PRE: per-source MP] ──▶ (rare middle) ──▶ [POST: pre-output MP] ──▶ output
+```
+
+- **PRE — the per-source multiprocessor** (`<source>_multiprocessor`, right after
+  each input). Everything **specific to that source**, because each source has one
+  known shape: parse/structure it, set severity and timestamp from *its* format,
+  drop noise (`filter`), sample low-value logs, and branch to `log_to_metric` /
+  `log_to_pattern`. Also clean up the fields *this parser* created (e.g.
+  `delete_key(attributes, "log_ts")` right after using it to set `timestamp`).
+
+- **POST — the multiprocessor just before the output** (all sources converge).
+  Only things **common to every source**: destination tagging (e.g. everything
+  bound for Splunk gets a `resource` tag), org-wide PII masking, a severity
+  fallback. This is the "output node" stage.
+
+- **Middle — anything between pre and post — should be rare.** If a step is
+  source-specific it belongs in PRE; if it's universal it belongs in POST. A
+  source-specific rule stranded in the shared stage (e.g. macOS `<Level>` severity
+  parsing applied to every source) is the most common mistake — move it into the
+  source's own multiprocessor.
+
+Rule of thumb: *does this apply to one source or all of them?* One → PRE. All →
+POST. Neither cleanly → reconsider the design.
 
 ## Troubleshooting
 
