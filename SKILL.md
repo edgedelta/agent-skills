@@ -21,6 +21,7 @@ Essential Edge Delta skills for AI agents, built on the `edx` CLI.
 | **ed-events** | Events: anomalies, monitor alerts, K8s events |
 | **ed-monitors** | Create, manage and resolve monitors |
 | **ed-pipelines** | Fleet management, config changes, deployments, live capture |
+| **ed-dashboards** | Create, update and validate metric dashboards |
 | **ed-investigate** | Cross-signal incident investigation workflow |
 | **ed-ai-teammate** | AI Teammate connectors and activity |
 
@@ -35,6 +36,7 @@ npx skills add edgedelta/agent-skills \
   --skill ed-traces \
   --skill ed-monitors \
   --skill ed-pipelines \
+  --skill ed-dashboards \
   --full-depth -y
 ```
 
@@ -66,6 +68,7 @@ Use this order for scoped commands:
 | List monitors | `edx monitors list --output table` |
 | List pipelines | `edx pipelines list --output table` |
 | Live capture | `edx capture start <pipeline-id> --duration 2m` |
+| List dashboards | `edx dashboards list --output table` |
 | Check auth | `edx auth status` |
 
 ## Auth
