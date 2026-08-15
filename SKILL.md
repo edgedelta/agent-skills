@@ -21,6 +21,7 @@ Essential Edge Delta skills for AI agents, built on the `edx` CLI.
 | **ed-events** | Events: anomalies, monitor alerts, K8s events |
 | **ed-monitors** | Create, manage and resolve monitors |
 | **ed-pipelines** | Fleet management, config changes, deployments, live capture |
+| **ed-rehydrations** | Replay archived data back through a pipeline |
 | **ed-dashboards** | Create, update and validate metric dashboards |
 | **ed-investigate** | Cross-signal incident investigation workflow |
 | **ed-ai-teammate** | AI Teammate connectors and activity |
