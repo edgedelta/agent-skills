@@ -88,6 +88,32 @@ edx monitors evaluate <monitor-id>   # prints value vs thresholds + ALERT/WARNIN
 edx monitors delete <monitor-id> --yes
 ```
 
+## Alert Noise - counting what actually fired
+
+Ranking monitors by how often they fire needs a **complete** event sweep. A
+plain `edx events search` returns one page (default 20) plus a `next_cursor`,
+so per-monitor counts taken from it are lower bounds, not totals. Use `--all`,
+which pages until the server reports the set complete, and write it to a file
+because 30 days of alerts is megabytes:
+
+```bash
+# Every monitor-triggered event in the last 30 days
+edx events search -q 'event.domain:"Monitor Alerts"' --lookback 720h --all \
+  --output-file alerts-30d.json
+# stderr: page 5: 213 item(s), 4213 total
+
+# Confirm the sweep finished, then rank the noisiest monitors
+jq '.pages, .total_items' alerts-30d.json
+jq -r '.items[].attributes["ed.monitor.id"]' alerts-30d.json \
+  | sort | uniq -c | sort -rn | head -20
+```
+
+`total_items` from `--all` is a true total: the command exits non-zero and
+prints nothing if any page fails, so it never reports a partial sweep as
+complete. Join the monitor IDs back to names with `edx monitors list
+--output-file monitors.json`. See **ed-events** > Pagination for paging by
+hand and **ed-edx** > Large outputs for why the file matters.
+
 ## Alert Triage
 
 When an alert fires:

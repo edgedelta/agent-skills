@@ -75,18 +75,55 @@ Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
 ## Conventions
 
 - **Output**: pretty JSON by default - parse it directly or pipe to `jq`.
-  `--output table --columns a,b,c` for human summaries.
+  `--output table --columns a,b,c` for human summaries. See **Large outputs**
+  below before parsing anything big.
 - **Time ranges**: `--lookback 15m|1h|24h` (Go durations) or
   `--from/--to` ISO 8601 (`2006-01-02T15:04:05.000Z`).
-- **Pagination**: search responses include cursors; pass `--cursor` to continue.
+- **Pagination**: search responses carry `next_cursor`. Non-empty means more
+  results exist - pass it back as `--cursor` with the query and time flags
+  unchanged; `""` means the set is complete. **A single page's count is a
+  lower bound until you see an empty cursor.** `edx events search --all`
+  sweeps every page for you (see **ed-events**).
 - **Confirmations**: destructive commands (`deploy`, `delete`) prompt; add
   `--yes` in non-interactive contexts.
-- **Limits**: default search limit is 20; raise with `--limit` (max 1000).
+- **Limits**: default search limit is 20; raise with `--limit`.
 - **Query fields use dot paths**: filter with `field.name:"value"` (e.g.
   `event.domain:"Monitor"`, `service.name:"api"`) even though the JSON response
   renders the same field with underscores (e.g. `event_domain`). Filter on the
   dotted form; read the underscore form. Confirm valid values with
   `edx facets options --scope <scope> --facet <field>`.
+
+## Large outputs - write to a file, do not parse stdout
+
+`edx` never truncates its own JSON, but the thing **reading** it often does:
+an agent tool's captured stdout is capped, and a big response gets clipped
+mid-token. The result parses as broken JSON (`Unterminated string ...`), which
+looks like a malformed API response but is not one.
+
+So for anything that can be large - a full monitor estate, a knowledge-graph
+topology, a multi-page event sweep, wide `--lookback` searches - use
+`--output-file` and read the file:
+
+```bash
+edx monitors list --output-file monitors.json
+# stderr: wrote monitors.json (818373 bytes)
+jq '.monitors | length' monitors.json
+```
+
+`--output-file` is a global flag (requires `edx` >= 0.20.0); it works on every
+command and honors `--output` (`--output yaml --output-file x.yaml` writes
+YAML). stdout stays empty, and the path plus byte count is confirmed on
+stderr. Write and close errors are surfaced, so a file that exists is a file
+that is complete.
+
+Rules of thumb:
+
+- Reach for `--output-file` **before** parsing, not after a parse fails.
+- Never "fix" a truncated parse by re-running with a smaller `--limit` - that
+  silently changes the answer. Write the full response to a file instead.
+- `--output table` truncates individual cells to 120 characters for
+  readability. Tables are for reading, not for extracting values - use JSON
+  (to a file) when a full field value matters.
 
 ## Escape Hatch
 
@@ -108,3 +145,5 @@ edx api GET /settings_v2/rehydration-settings
 | Empty search results | Widen `--lookback`; verify fields with `edx facets options` |
 | 500 / "Failed to query ..." | Server-side error, not your query. Retry the same command; if it persists, narrow the time range. Do NOT keep editing the query - widening `--lookback` will not fix a 5xx. |
 | Timeout on large queries | Narrow the time range or add `--timeout 120s` |
+| "Unterminated string" / truncated JSON when parsing output | Not an API error - your stdout capture is capped. Re-run with `--output-file <path>` and parse the file |
+| A count looks suspiciously round (20, 1000) | You read one page. Check `next_cursor`; use `edx events search --all` for a complete sweep |
