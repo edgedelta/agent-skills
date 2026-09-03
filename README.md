@@ -1,7 +1,8 @@
 # Edge Delta Agent Skills
 
 Edge Delta skills for AI agents (Claude Code, Cursor, Copilot and other
-SKILL.md-compatible tools), built on the [`edx` CLI](https://github.com/edgedelta/edx).
+SKILL.md-compatible tools), built on the [`edx` CLI](https://github.com/edgedelta/edx)
+and Edge Delta's SDKs.
 
 ## See it in action
 
@@ -37,6 +38,7 @@ appear on screen.
 | [ed-pipeline-tuning](ed-pipeline-tuning/SKILL.md) | Improve data quality: parse, structure, enrich, mask, roll up to metrics/patterns |
 | [ed-investigate](ed-investigate/SKILL.md) | Cross-signal incident investigation workflow |
 | [ed-ai-teammate](ed-ai-teammate/SKILL.md) | AI Teammate connectors and activity |
+| [ed-browser-rum](ed-browser-rum/SKILL.md) | Browser RUM: page-load performance, Core Web Vitals and JS errors from real visitors |
 
 ## Setup edx
 
@@ -70,6 +72,7 @@ npx skills add edgedelta/agent-skills \
   --skill ed-events \
   --skill ed-investigate \
   --skill ed-ai-teammate \
+  --skill ed-browser-rum \
   --full-depth -y
 ```
 

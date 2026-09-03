@@ -1,13 +1,14 @@
 ---
 name: edgedelta-skills
-description: Edge Delta skills for AI agents. Pipelines, logs, metrics, traces, monitors and AI Teammate.
+description: Edge Delta skills for AI agents. Pipelines, logs, metrics, traces, monitors, browser RUM and AI Teammate.
 metadata:
   version: "1.0.0"
 ---
 
 # Edge Delta Skills
 
-Essential Edge Delta skills for AI agents, built on the `edx` CLI.
+Essential Edge Delta skills for AI agents, built on the `edx` CLI and Edge
+Delta's SDKs.
 
 ## Core Skills
 
@@ -25,6 +26,7 @@ Essential Edge Delta skills for AI agents, built on the `edx` CLI.
 | **ed-dashboards** | Create, update and validate metric dashboards |
 | **ed-investigate** | Cross-signal incident investigation workflow |
 | **ed-ai-teammate** | AI Teammate connectors and activity |
+| **ed-browser-rum** | Browser RUM: page loads, Core Web Vitals and JS errors from real visitors |
 
 ## Install
 
@@ -43,7 +45,8 @@ npx skills add edgedelta/agent-skills \
 
 ## Prerequisites
 
-The `edx` CLI must be installed and authenticated. See the **ed-edx** skill or
+Every skill except **ed-browser-rum** needs the `edx` CLI installed and
+authenticated. See the **ed-edx** skill or
 [edgedelta/edx](https://github.com/edgedelta/edx).
 
 ## Command Execution Policy
