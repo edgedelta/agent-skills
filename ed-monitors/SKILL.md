@@ -98,28 +98,32 @@ because 30 days of alerts is megabytes:
 
 ```bash
 # Every monitor-triggered event in the last 30 days
-edx events search -q 'event.domain:"Monitor Alerts"' --lookback 720h --all \
+edx events search -q 'event.domain:"Monitor"' --lookback 720h --all \
   --output-file alerts-30d.json
-# stderr: page 5: 213 item(s), 4213 total
+# stderr: page 1: 1000 item(s), 1000 total ... (one line per page)
 
-# Confirm the sweep finished, then rank the noisiest monitors
+# Confirm the sweep finished, then rank the noisiest monitors.
+# The monitor ID and name live under "resource" (NOT "attributes"):
+#   .resource["ed.monitor.id"]   monitor ID
+#   .resource["event.name"]      monitor name
 jq '.pages, .total_items' alerts-30d.json
-jq -r '.items[].attributes["ed.monitor.id"]' alerts-30d.json \
-  | sort | uniq -c | sort -rn | head -20
+jq -r '.items[].resource | .["ed.monitor.id"] + "  " + .["event.name"]' \
+  alerts-30d.json | sort | uniq -c | sort -rn | head -20
 ```
 
 `total_items` from `--all` is a true total: the command exits non-zero and
 prints nothing if any page fails, so it never reports a partial sweep as
-complete. Join the monitor IDs back to names with `edx monitors list
---output-file monitors.json`. See **ed-events** > Pagination for paging by
-hand and **ed-edx** > Large outputs for why the file matters.
+complete. `attributes` carries the evaluation detail instead
+(`ed.monitor.evaluated.value`, `ed.monitor.query`, `ed.monitor.priority`,
+`ed.monitor.type`, ...). See **ed-events** > Pagination for paging by hand
+and **ed-edx** > Large outputs for why the file matters.
 
 ## Alert Triage
 
 When an alert fires:
 
 1. `edx monitors get <id>` - what condition fired? what query?
-2. `edx events search -q 'event.domain:"Monitor Alerts"' --lookback 2h` -
+2. `edx events search -q 'event.domain:"Monitor"' --lookback 2h` -
    correlated alerts around the same time?
 3. Run the monitor's underlying query yourself with a wider window to see
    the trend (`edx logs graph` / `edx metrics query`).

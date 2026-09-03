@@ -65,14 +65,18 @@ progress on stderr:
 
 ```bash
 # Every monitor alert in the last 30 days, complete
-edx events search -q 'event.domain:"Monitor Alerts"' --lookback 720h --all \
+edx events search -q 'event.domain:"Monitor"' --lookback 720h --all \
   --output-file alerts-30d.json
 # stderr: page 1: 1000 item(s), 1000 total
 #         page 2: 1000 item(s), 2000 total
 #         ...
-#         page 5: 213 item(s), 4213 total
-jq '.total_items, .pages' alerts-30d.json     # 4213, 5
+jq '.total_items, .pages' alerts-30d.json
 ```
+
+The monitor domain is `"Monitor"` on current orgs (`"Monitor Alerts"` exists
+on older data - `event.domain:("Monitor" OR "Monitor Alerts")` covers both).
+Do not guess domain values; list the live set first:
+`edx facets options --scope event --facet event.domain`.
 
 - With `--all`, `--limit` is the **page size** and defaults to 1000 (the
   server's own default) rather than 20. Leave it alone unless you have a
@@ -80,6 +84,10 @@ jq '.total_items, .pages' alerts-30d.json     # 4213, 5
 - `--all` is atomic: if any page fails, the command exits non-zero and prints
   **nothing**, so a partial sweep can never be misread as a complete one. A
   `total_items` you did receive is therefore always a true total.
+- Long sweeps survive flaky pages: a failed page is retried a few times with
+  backoff (the event search backend 500s transiently under load). If it still
+  fails, the error names the cursor to resume from
+  (`resume from this point with --all --cursor '...'`).
 - Pair it with `--output-file` (see **ed-edx** > Large outputs); a 30-day
   monitor sweep is easily megabytes.
 
@@ -87,10 +95,10 @@ Paging by hand is still available when you want one page at a time - pass the
 previous response's `next_cursor` and keep the query and time flags identical:
 
 ```bash
-edx events search -q 'event.domain:"Monitor Alerts"' --lookback 720h --limit 1000
-# -> "next_cursor": "MTAwMA=="
-edx events search -q 'event.domain:"Monitor Alerts"' --lookback 720h --limit 1000 \
-  --cursor 'MTAwMA=='
+edx events search -q 'event.domain:"Monitor"' --lookback 720h --limit 1000
+# -> "next_cursor": "PP-FAwEBBmN1cnNvcg..."   (opaque - pass it back verbatim)
+edx events search -q 'event.domain:"Monitor"' --lookback 720h --limit 1000 \
+  --cursor 'PP-FAwEBBmN1cnNvcg...'
 # repeat until "next_cursor": ""
 ```
 
