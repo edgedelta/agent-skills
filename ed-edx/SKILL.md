@@ -131,8 +131,8 @@ The contract:
 # every monitor, not just the first server-default page
 edx monitors list --all --output-file monitors.json
 # a complete 30-day event sweep
-edx events search -q 'event.domain:"Monitor"' --lookback 720h --all \
-  --output-file alerts-30d.json
+edx events search -q 'event.domain:("Monitor" OR "Monitor Alerts")' \
+  --lookback 720h --all --output-file alerts-30d.json
 ```
 
 Not everything paginates: `patterns list/samples`, `metrics query`,

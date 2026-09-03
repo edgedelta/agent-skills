@@ -102,8 +102,8 @@ because 30 days of alerts is megabytes:
 
 ```bash
 # Every monitor-triggered event in the last 30 days
-edx events search -q 'event.domain:"Monitor"' --lookback 720h --all \
-  --output-file alerts-30d.json
+edx events search -q 'event.domain:("Monitor" OR "Monitor Alerts")' \
+  --lookback 720h --all --output-file alerts-30d.json
 # stderr: page 1: 1000 item(s), 1000 total ... (one line per page)
 
 # Confirm the sweep finished, then rank the noisiest monitors.
@@ -127,7 +127,7 @@ and **ed-edx** > Large outputs for why the file matters.
 When an alert fires:
 
 1. `edx monitors get <id>` - what condition fired? what query?
-2. `edx events search -q 'event.domain:"Monitor"' --lookback 2h` -
+2. `edx events search -q 'event.domain:("Monitor" OR "Monitor Alerts")' --lookback 2h` -
    correlated alerts around the same time?
 3. Run the monitor's underlying query yourself with a wider window to see
    the trend (`edx logs graph` / `edx metrics query`).
