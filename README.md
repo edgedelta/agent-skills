@@ -36,6 +36,7 @@ appear on screen.
 | [ed-pipelines](ed-pipelines/SKILL.md) | Fleet management, config changes, deployments, live capture |
 | [ed-rehydrations](ed-rehydrations/SKILL.md) | Replay archived data back through a pipeline |
 | [ed-pipeline-tuning](ed-pipeline-tuning/SKILL.md) | Improve data quality: parse, structure, enrich, mask, roll up to metrics/patterns |
+| [ed-dashboards](ed-dashboards/SKILL.md) | Create, update, validate and screenshot metric dashboards |
 | [ed-investigate](ed-investigate/SKILL.md) | Cross-signal incident investigation workflow |
 | [ed-ai-teammate](ed-ai-teammate/SKILL.md) | AI Teammate connectors and activity |
 | [ed-browser-rum](ed-browser-rum/SKILL.md) | Browser RUM: page-load performance, Core Web Vitals and JS errors from real visitors |
@@ -68,7 +69,9 @@ npx skills add edgedelta/agent-skills \
   --skill ed-traces \
   --skill ed-monitors \
   --skill ed-pipelines \
+  --skill ed-rehydrations \
   --skill ed-pipeline-tuning \
+  --skill ed-dashboards \
   --skill ed-events \
   --skill ed-investigate \
   --skill ed-ai-teammate \

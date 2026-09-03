@@ -23,6 +23,7 @@ Delta's SDKs.
 | **ed-monitors** | Create, manage and resolve monitors |
 | **ed-pipelines** | Fleet management, config changes, deployments, live capture |
 | **ed-rehydrations** | Replay archived data back through a pipeline |
+| **ed-pipeline-tuning** | Improve data quality: parse, structure, enrich, mask, roll up to metrics/patterns |
 | **ed-dashboards** | Create, update and validate metric dashboards |
 | **ed-investigate** | Cross-signal incident investigation workflow |
 | **ed-ai-teammate** | AI Teammate connectors and activity |
