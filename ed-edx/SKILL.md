@@ -112,8 +112,9 @@ The contract:
   `--cursor` with the query and time flags unchanged; an **empty cursor**
   means the set is complete.
 - Defaults silently under-read: `logs/traces/events search` default to
-  `--limit 20`, and `monitors list` returns the server's 50 - e.g. an org with
-  68 monitors looks like 50 until you check the cursor.
+  `--limit 20`, and `monitors list` returns the server's 50. Any org with more
+  than a page's worth looks like exactly the default until you check the
+  cursor.
 - **`--all` closes the loop**: it follows the cursor until the set is
   complete and prints one combined `{<array>, pages, total_items,
   next_cursor: ""}` response, with per-page progress on stderr. A failed page

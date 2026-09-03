@@ -27,8 +27,8 @@ edx monitors states -q 'monitor.status:"alert"'
 ```
 
 `monitors list` and `monitors states` are cursor-paginated like every list
-command (**ed-edx** > Pagination): without `--all`, an org with 68 monitors
-looks like 50.
+command (**ed-edx** > Pagination): without `--all`, the bare list returns one
+page of the server default 50, so a larger estate silently undercounts.
 
 ## Create / Update
 
