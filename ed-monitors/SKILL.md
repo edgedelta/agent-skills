@@ -20,11 +20,15 @@ The `edx` CLI must be installed and authenticated. See the **ed-edx** skill.
 ## Inspect
 
 ```bash
-edx monitors list --output table
+edx monitors list --all --output table # ALL monitors (plain list caps at the server's 50)
 edx monitors get <monitor-id>          # full definition: query, thresholds, notifications
-edx monitors states                    # current triggered/resolved states
+edx monitors states --all              # triggered/resolved states, complete
 edx monitors states -q 'monitor.status:"alert"'
 ```
+
+`monitors list` and `monitors states` are cursor-paginated like every list
+command (**ed-edx** > Pagination): without `--all`, an org with 68 monitors
+looks like 50.
 
 ## Create / Update
 

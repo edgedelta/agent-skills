@@ -79,11 +79,10 @@ Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
   below before parsing anything big.
 - **Time ranges**: `--lookback 15m|1h|24h` (Go durations) or
   `--from/--to` ISO 8601 (`2006-01-02T15:04:05.000Z`).
-- **Pagination**: search responses carry `next_cursor`. Non-empty means more
-  results exist - pass it back as `--cursor` with the query and time flags
-  unchanged; `""` means the set is complete. **A single page's count is a
-  lower bound until you see an empty cursor.** `edx events search --all`
-  sweeps every page for you (see **ed-events**).
+- **Pagination**: list/search responses carry a cursor; a single page's count
+  is a lower bound until the cursor comes back empty. Every cursor-paginated
+  command takes `--all` to sweep the complete result set. See **Pagination**
+  below.
 - **Confirmations**: destructive commands (`deploy`, `delete`) prompt; add
   `--yes` in non-interactive contexts.
 - **Limits**: default search limit is 20; raise with `--limit`.
@@ -92,6 +91,51 @@ Re-run `edx auth login` (token from Admin > API Tokens, or `--oauth`).
   renders the same field with underscores (e.g. `event_domain`). Filter on the
   dotted form; read the underscore form. Confirm valid values with
   `edx facets options --scope <scope> --facet <field>`.
+
+## Pagination - one page is a lower bound, --all is the total
+
+Cursor pagination is one convention across the API, so every one of these
+commands behaves the same way:
+
+| Commands | Response array | Cursor field |
+|---|---|---|
+| `logs search`, `traces search`, `events search` | `items` | `next_cursor` |
+| `monitors list` / `monitors states` | `monitors` / `states` | `next_cursor` |
+| `rehydrations list` | `rehydrations` | `next_cursor` |
+| `ai issues list/threads`, `ai channels list/messages`, `ai threads list/messages`, `ai workflows list`, `ai workflows runs list` | `data` | `nextCursor` |
+| `ai knowledge search` | `data.matches` | `data.nextCursor` |
+
+The contract:
+
+- A response with a **non-empty cursor** has more results: the page you got is
+  a lower bound, never a total. Continue by passing the cursor back as
+  `--cursor` with the query and time flags unchanged; an **empty cursor**
+  means the set is complete.
+- Defaults silently under-read: `logs/traces/events search` default to
+  `--limit 20`, and `monitors list` returns the server's 50 - e.g. an org with
+  68 monitors looks like 50 until you check the cursor.
+- **`--all` closes the loop**: it follows the cursor until the set is
+  complete and prints one combined `{<array>, pages, total_items,
+  next_cursor: ""}` response, with per-page progress on stderr. A failed page
+  is retried with backoff (search backends 500 transiently under load); if it
+  still fails, the command exits non-zero, prints **nothing** (a partial sweep
+  never masquerades as a total), and names the cursor to resume from with
+  `--all --cursor`.
+- Without `--all`, a page that leaves results behind prints a note on
+  **stderr** (`more results exist: ...`). Keep stderr out of your jq pipe.
+- Under `--all`, `--limit` is the page size; leave it unset for a sensible
+  default.
+
+```bash
+# every monitor, not just the first server-default page
+edx monitors list --all --output-file monitors.json
+# a complete 30-day event sweep
+edx events search -q 'event.domain:"Monitor"' --lookback 720h --all \
+  --output-file alerts-30d.json
+```
+
+Not everything paginates: `patterns list/samples`, `metrics query`,
+`logs graph` and `facets` return bounded or aggregated results with no cursor.
 
 ## Large outputs - write to a file, do not parse stdout
 
@@ -105,8 +149,8 @@ topology, a multi-page event sweep, wide `--lookback` searches - use
 `--output-file` and read the file:
 
 ```bash
-edx monitors list --output-file monitors.json
-# stderr: wrote monitors.json (818373 bytes)
+edx monitors list --all --output-file monitors.json
+# stderr: wrote monitors.json (109741 bytes)
 jq '.monitors | length' monitors.json
 ```
 
@@ -146,4 +190,4 @@ edx api GET /settings_v2/rehydration-settings
 | 500 / "Failed to query ..." | Server-side error, not your query. Retry the same command; if it persists, narrow the time range. Do NOT keep editing the query - widening `--lookback` will not fix a 5xx. |
 | Timeout on large queries | Narrow the time range or add `--timeout 120s` |
 | "Unterminated string" / truncated JSON when parsing output | Not an API error - your stdout capture is capped. Re-run with `--output-file <path>` and parse the file |
-| A count looks suspiciously round (20, 1000) | You read one page. Check `next_cursor`; use `edx events search --all` for a complete sweep |
+| A count looks suspiciously round (20, 50, 1000) | You read one page. Check the cursor; re-run with `--all` for the complete set |
