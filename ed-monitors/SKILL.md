@@ -92,36 +92,6 @@ edx monitors evaluate <monitor-id>   # prints value vs thresholds + ALERT/WARNIN
 edx monitors delete <monitor-id> --yes
 ```
 
-## Alert Noise - counting what actually fired
-
-Ranking monitors by how often they fire needs a **complete** event sweep. A
-plain `edx events search` returns one page (default 20) plus a `next_cursor`,
-so per-monitor counts taken from it are lower bounds, not totals. Use `--all`,
-which pages until the server reports the set complete, and write it to a file
-because 30 days of alerts is megabytes:
-
-```bash
-# Every monitor-triggered event in the last 30 days
-edx events search -q 'event.domain:("Monitor" OR "Monitor Alerts")' \
-  --lookback 720h --all --output-file alerts-30d.json
-# stderr: page 1: 1000 item(s), 1000 total ... (one line per page)
-
-# Confirm the sweep finished, then rank the noisiest monitors.
-# The monitor ID and name live under "resource" (NOT "attributes"):
-#   .resource["ed.monitor.id"]   monitor ID
-#   .resource["event.name"]      monitor name
-jq '.pages, .total_items' alerts-30d.json
-jq -r '.items[].resource | .["ed.monitor.id"] + "  " + .["event.name"]' \
-  alerts-30d.json | sort | uniq -c | sort -rn | head -20
-```
-
-`total_items` from `--all` is a true total: the command exits non-zero and
-prints nothing if any page fails, so it never reports a partial sweep as
-complete. `attributes` carries the evaluation detail instead
-(`ed.monitor.evaluated.value`, `ed.monitor.query`, `ed.monitor.priority`,
-`ed.monitor.type`, ...). See **ed-events** > Pagination for paging by hand
-and **ed-edx** > Large outputs for why the file matters.
-
 ## Alert Triage
 
 When an alert fires:
@@ -132,6 +102,18 @@ When an alert fires:
 3. Run the monitor's underlying query yourself with a wider window to see
    the trend (`edx logs graph` / `edx metrics query`).
 4. Pivot to the **ed-investigate** skill for full root-cause analysis.
+
+To see which monitors fire most, sweep monitor events over a wide window
+(**ed-events**) and count per monitor. Monitor identity in event records is
+under `resource`; `attributes` carries the evaluation detail
+(`ed.monitor.evaluated.value`, `ed.monitor.query`, ...):
+
+```bash
+edx events search -q 'event.domain:("Monitor" OR "Monitor Alerts")' \
+  --lookback 720h --all --output-file alerts-30d.json
+jq -r '.items[].resource | .["ed.monitor.id"] + "  " + .["event.name"]' \
+  alerts-30d.json | sort | uniq -c | sort -rn | head -20
+```
 
 ## Good Practices
 
