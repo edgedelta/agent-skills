@@ -115,7 +115,7 @@ The contract:
   `--limit 20`, and `monitors list` returns the server's 50. Any org with more
   than a page's worth looks like exactly the default until you check the
   cursor.
-- **`--all` closes the loop**: it follows the cursor until the set is
+- **`--all` completes the read**: it follows the cursor until the set is
   complete and prints one combined `{<array>, pages, total_items,
   next_cursor: ""}` response, with per-page progress on stderr. A failed page
   is retried with backoff (search backends 500 transiently under load); if it
