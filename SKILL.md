@@ -14,6 +14,7 @@ Delta's SDKs.
 
 | Skill | Description |
 |-------|-------------|
+| **ed-onboard** | Discover environments, provision direct collection, and verify telemetry |
 | **ed-edx** | Primary CLI - all edx commands, auth, setup |
 | **ed-logs** | Search logs with CQL, log volume graphs |
 | **ed-patterns** | Log patterns, anomaly and sentiment analysis |
@@ -34,6 +35,7 @@ Delta's SDKs.
 ```bash
 npx skills add edgedelta/agent-skills \
   --skill ed-edx \
+  --skill ed-onboard \
   --skill ed-logs \
   --skill ed-patterns \
   --skill ed-metrics \
