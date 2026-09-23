@@ -1,17 +1,18 @@
 # Verification
 
-Use a unique service name/run ID and a known recent start time. For a fixture, verify
-its expected log marker, non-null metric value and trace ID. For real onboarding use
-actual source activity; synthetic receiver traffic alone cannot establish source coverage.
+Scope evidence to the onboarded resource and a known recent time window. Verify actual
+source activity; synthetic receiver traffic alone cannot establish source coverage.
+For an authorized fixture, use a unique marker/service identity and known expected data.
+For customer workloads, use their existing identities and observable activity instead.
+
+Build source-specific queries from discovered fields. For example, define SOURCE_QUERY
+and METRIC_FILTER as appropriate CQL filters and METRIC_NAME as a discovered metric:
 
 ```bash
-edx --profile "$ED_PROFILE" logs search \
-  -q "service.name:\"$RUN_ID\"" --lookback 30m --limit 10
-edx --profile "$ED_PROFILE" metrics list --keyword ed.onboard.heartbeat
-edx --profile "$ED_PROFILE" metrics query --name ed.onboard.heartbeat \
-  --agg max --filter "service.name:\"$RUN_ID\"" --lookback 30m
-edx --profile "$ED_PROFILE" traces search \
-  -q "service.name:\"$RUN_ID\"" --lookback 30m --limit 10
+edx --profile "$ED_PROFILE" logs search -q "$SOURCE_QUERY" --lookback 30m --limit 10
+edx --profile "$ED_PROFILE" metrics query --name "$METRIC_NAME" \
+  --agg max --filter "$METRIC_FILTER" --lookback 30m
+edx --profile "$ED_PROFILE" traces search -q "$SOURCE_QUERY" --lookback 30m --limit 10
 ```
 
 Discover indexed fields with `edx facets keys` when adapting queries. Metrics must have
@@ -33,12 +34,12 @@ when temporary cleanup is within scope; keep a durable inventory for interrupted
 - Source: use native capture/source counters to distinguish no source activity from an
   agent failing to receive it. Transport success alone is not an indexed-data check.
 - Transformation: inspect after-processing records for source identity, timestamp,
-  metric name/value/unit and unwanted duplicates. Use recipe fixtures before deployment.
+  metric name/value/unit and unwanted duplicates. Use representative inputs with expected outputs before deployment.
 - Indexing: query recent source-specific logs and actual metric timeseries. A real zero
   sample is valid; a zero aggregate without samples is not. Inspect child spans when
   verifying database-client instrumentation, separately from database engine telemetry.
 
-Allow AWS stream buffering, agent flush intervals and indexing delay. Set a bounded
+Allow source/export buffering, agent flush intervals and indexing delay. Set a bounded
 polling deadline appropriate to the path (for example ten minutes), retain evidence,
 and diagnose the missing stage when it expires rather than recreating working resources.
 Do not shrink result limits to work around truncated output: use edx --output-file.
@@ -55,3 +56,25 @@ shutdown-assisted smoke tests do not establish steady-state ingestion latency.
 If validation creates incorrect test series, record their names and affected interval.
 Use corrected, distinct test names or a clearly bounded clean interval for evidence;
 do not present earlier invalid samples as passing data or silently erase that history.
+
+## Transformation checks
+
+Use existing edx processor previews with representative source records. Include both
+accepted and rejected records; compare exact signal names, values/units, source identity,
+original timestamps and output counts. Do not merely assert that some output exists.
+If a runtime cannot preview the processor, verify native capture in an authorized test
+and label the remaining uncertainty rather than inventing a local interpreter.
+
+The Go agent runs exposed several pitfalls worth checking when applicable:
+- Separate extract_metric condition entries are alternatives; combine required checks
+  into one conjunction. For gauges, preserve measurement semantics rather than summing
+  samples or treating a rate as a cumulative counter.
+- Setting an arbitrary field can validate without changing the event's timestamp. Verify
+  the actual timestamp, using the deployed runtime's supported field and units.
+- A sequence may pass unmatched records through as logs despite `keep_item: false` on
+  extraction. Inspect actual outputs and add an explicit data-type filter when the
+  destination should receive only extracted metrics. Test unknown names and zero counts.
+- Valid zero-valued measurements must survive filtering; missing measurements must not
+  be fabricated as zeros. A batched source must preserve each event and its identity.
+
+These are checks to adapt to the source/runtime, not mandatory processors for every pipeline.

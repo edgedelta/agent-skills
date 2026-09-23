@@ -26,7 +26,7 @@ appear on screen.
 
 | Skill | Description |
 |-------|-------------|
-| [ed-onboard](ed-onboard/SKILL.md) | Discover environments, provision direct collection, and verify telemetry |
+| [ed-onboard](ed-onboard/SKILL.md) | Connect cloud, on-premises and hybrid telemetry sources to Edge Delta |
 | [ed-edx](ed-edx/SKILL.md) | Primary CLI - all edx commands, auth, setup |
 | [ed-logs](ed-logs/SKILL.md) | Search logs with CQL, log volume graphs |
 | [ed-patterns](ed-patterns/SKILL.md) | Log patterns, anomaly and sentiment analysis |

@@ -14,7 +14,7 @@ Delta's SDKs.
 
 | Skill | Description |
 |-------|-------------|
-| **ed-onboard** | Discover environments, provision direct collection, and verify telemetry |
+| **ed-onboard** | Connect cloud, on-premises and hybrid telemetry sources to Edge Delta |
 | **ed-edx** | Primary CLI - all edx commands, auth, setup |
 | **ed-logs** | Search logs with CQL, log volume graphs |
 | **ed-patterns** | Log patterns, anomaly and sentiment analysis |

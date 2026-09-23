@@ -1,113 +1,89 @@
 ---
 name: ed-onboard
-description: Connect customer environments to Edge Delta, selecting direct collection paths, provisioning pipelines and agents, and verifying source-specific logs, metrics and traces. Use for first-time onboarding or adding telemetry sources.
+description: Connect customer systems to Edge Delta across cloud providers, on-premises and hybrid environments. Discover telemetry sources, choose supported collection paths, configure pipelines and agents, and verify logs, metrics and traces. Use for first-time onboarding or adding sources.
 metadata:
   version: "1.0.0"
   author: edgedelta
   repository: https://github.com/edgedelta/agent-skills
-  tags: edgedelta,onboarding,aws,ecs,eks,rds
+  tags: edgedelta,onboarding,telemetry,integrations
 ---
 
 # Onboard telemetry to Edge Delta
 
-Use `edx` for Edge Delta operations and the customer's cloud CLI or infrastructure
-as code for their environment. See **ed-edx** for authentication and **ed-pipelines**
-for existing pipeline changes. Do not confuse AWS profiles with Edge Delta profiles.
+Start from the customer's systems and requested signals, not a cloud provider or a
+fixed list of services. This applies to hosts, containers, Kubernetes, applications,
+databases, managed services and other telemetry-producing systems. A source does not
+need its own recipe in this skill to be onboarded.
+
+Use **ed-edx** for Edge Delta operations and the environment's existing tools, provider
+CLI, APIs or infrastructure as code for deployment. Use **ed-pipelines** for pipeline
+lifecycle and **ed-pipeline-tuning** for processing. Keep environment credentials and
+context separate from the Edge Delta organization/profile.
 
 ## Collection principles
 
-- Minimize hops. Prefer source → Edge Delta agent → Edge Delta, or compatible
-  source → Edge Delta when local collection/processing is unnecessary.
-- Prefer the Edge Delta agent. Add another collector only for a verified capability
-  gap; explain the requirement and cost before selecting that exception.
-- Avoid CloudWatch or other paid intermediary ingestion/storage when direct collection
-  is supported. Existing CloudWatch usage does not make forwarding the preferred path.
-- Test the actual collection path. Use Edge Delta sources to pull external data or
-  receive native pushes. Do not fetch source data in an ad-hoc script and resubmit it
-  to OTLP as proof of source support. Application instrumentation may emit its own
-  activity, but does not establish native infrastructure/database collection.
-- Where agents can run, include applicable workload logs and host/container/Kubernetes
-  metrics; synthetic OTLP traffic alone is not environment onboarding.
-- Decide per signal. An installed agent cannot manufacture application traces, access
-  an isolated container's stdout, or read a managed database's host filesystem.
-- Preserve existing collection until the replacement is verified; report duplicate
-  ingestion during migration and remove the old path only within authorized scope.
+- Minimize hops and duplicate ingestion. Prefer native push directly to a compatible
+  Edge Delta receiver, or an Edge Delta agent close to the source when collection or
+  local processing is needed. For pull sources, let a supported Edge Delta source pull.
+- Prefer Edge Delta agents over another collector. Add an intermediary or collector
+  only for a verified requirement, explaining its operational and cost implications.
+  Existing use of a provider's logging service does not make it the preferred path.
+- Decide per signal. Application/client telemetry does not establish host, service or
+  database-server coverage. An agent does not manufacture application traces or gain
+  access to a managed service's private filesystem.
+- A missing direct path is a gap to explain, not a reason to silently omit a requested
+  signal. Propose the shortest supported alternative and honor existing authorization
+  for exceptions. Do not promise an integration based only on a similar product name.
+- Verify the real source path. Do not fetch infrastructure data in an ad-hoc script and
+  resubmit it as proof that an Edge Delta source supports the integration. Application
+  instrumentation may emit its own measured activity.
+- Preserve existing collection until its replacement is verified. Retire duplicate
+  paths only within scope and honor explicit retention instructions.
 
-## Adaptive onboarding responsibilities
+## Adapt to the environment
 
-These are responsibilities, not mandatory command stages. Revisit them as discovery
-changes the best collection path; edx provides operations, not an onboarding state machine.
+Discover the user's chosen environment boundaries: provider/account/project/subscription,
+cluster/context, hosts, region or datacenter as applicable. Identify actual resources,
+current telemetry paths, agents and ownership. Inspect only the authorized scope; access
+denied means inaccessible, not absent. Do not create demo infrastructure merely because
+discovery returned an empty result.
 
-1. Establish AWS account/profile/regions, Edge Delta profile/org, resources and requested
-   signals from the user's scope. Read-only discovery may continue while ambiguities
-   are resolved. Never infer a destination organization from an AWS profile name.
-2. Discover resources, current telemetry paths, agent deployments and pipeline IDs.
-   Record each region/service as inspected, empty or inaccessible. Access denied is
-   not evidence of absence. Read [AWS discovery](references/aws.md).
-3. Select the shortest supported path. Read only the applicable recipe:
-   [ECS Fargate](references/ecs-fargate.md), [EKS](references/eks.md),
-   [RDS](references/rds.md). For other sources, inspect agent source capabilities and
-   deployment documentation before claiming support; record gaps explicitly. Build a
-   per-resource coverage table: requested signal, native source, proposed path, exception,
-   and evidence/status. Separate server signals from application/client telemetry.
-   Minimizing hops does not justify silently omitting a signal: propose the supported
-   exception and tradeoff, respecting any authorization already given.
-4. Prepare concrete configuration and infrastructure changes. Record account, org,
-   resource IDs, signals, paths, versions, permissions, network needs, rollout effects,
-   ownership, and cleanup/rollback actions. Keep credentials out of plans and output.
-   Keep a durable local inventory as described in [handoff](references/handoff.md);
-   no backend onboarding record or fixed plan format is required.
-   Reuse existing owned resources when appropriate; do not create duplicates on reruns.
-   Respect Terraform/GitOps ownership by changing its source rather than introducing drift.
-5. Execute within the user's authorization. Existing authorization to deploy/test is
-   sufficient; do not ask again for every step. For unapproved mutations, present the
-   concrete plan first. Track created IDs immediately, including partial failures.
-6. Verify every requested signal with [verification](references/verification.md).
-   Use [recipe checks](references/recipe-checks.md) when adapting parsing/extraction.
-   Distinguish healthy deployment, accepted export, correct transformation and queryable
-   source telemetry.
-   Report unsupported, blocked and unverified signals separately from passing ones.
-7. Honor retention instructions. If the user asks to keep the deployment, leave agents
-   and workloads running and record IDs, access instructions, ongoing costs and the
-   eventual cleanup procedure. Do not stop agents to force a verification flush.
-   Otherwise, for temporary tests, stop senders, uninstall agents, remove owned cloud resources,
-   then delete the temporary pipeline. Verify deletion and list residual resources.
-   Never delete preexisting customer resources or broaden cleanup by name prefix alone.
+Track requested logs, metrics and traces per resource, with selected source/path,
+capability gaps, necessary exceptions and evidence/status. For a simple source this can
+be a short note rather than a formal plan. Revisit choices as discovery reveals constraints.
+
+Choose by source capabilities using [collection paths](references/collection-paths.md).
+Inspect supported inputs, formats, authentication and deployment options for the actual
+Edge Delta runtime. Read [cloud hints](references/cloud-hints.md) only when relevant;
+these are optional examples, not a supported-provider list or the default workflow.
+
+Prepare and apply changes through the customer's existing ownership mechanism. Reuse
+appropriate resources, reconcile uncertain creates before retrying, and track created
+IDs immediately. Existing authorization to perform the work is sufficient; ask only for
+missing scope or an action outside it. Keep credentials out of artifacts and use the
+customer's secret-delivery mechanism for agent credentials.
+
+Verify with [verification](references/verification.md), distinguishing deployment health,
+source receipt, correct processing and indexed telemetry. Report partial coverage and
+unverified signals explicitly. Keep a proportionate [handoff](references/handoff.md) for
+work spanning sessions or involving created resources. No fixed command stages or
+backend onboarding state are required.
+
+When asked to retain a test, keep agents and workloads running. When cleanup is authorized,
+remove only owned resources in dependency order and verify residuals. Deleting a pipeline
+configuration does not uninstall its agents or delete external infrastructure.
 
 ## Pipeline authoring
 
-Follow **ed-pipelines** for source-attached and destination-attached multiprocessors.
-Every application source and destination gets a `type: sequence` node named exactly
-`<node-name>_multiprocessor`, immediately after the source or before the destination,
-even when empty. These attachments are distinct from standalone middle processors.
-Keep the default direct path for agent self-telemetry and internal statistics.
+Follow **ed-pipelines** for directly attached multiprocessors: each application source
+and destination gets a `type: sequence` named `<node-name>_multiprocessor`, even when
+empty. Standalone intermediate processors do not replace these attachments. Preserve
+default direct self-telemetry/internal-statistics routing.
 
-Give every nested processor a meaningful display name in its JSON-encoded `metadata`
-string, for example `metadata: '{"name":"Set service identity"}'`. Preserve other
-metadata keys; do not leave Custom OTTL processors displayed as "Custom". Check these
-conventions in generated templates and before validating or creating the pipeline.
+Give nested processors meaningful display names through JSON-encoded `metadata.name`,
+including Custom OTTL. Preserve existing metadata and processing semantics.
 
-## New edge pipelines
-
-Requires an edx build exposing `pipelines create/delete`; inspect `--help` first.
-
-```bash
-edx --profile "$ED_PROFILE" pipelines list --keyword "$RUN_ID"
-edx --profile "$ED_PROFILE" pipelines validate --file pipeline.yaml
-edx --profile "$ED_PROFILE" pipelines create --file pipeline.yaml \
-  --tag "$RUN_ID" --environment Docker
-# Capture the returned id privately. The initial configuration is already deployed.
-edx --profile "$ED_PROFILE" pipelines deploy-command "$CONF_ID"
-```
-
-Treat deployment commands as sensitive: they may contain agent credentials. Use the
-server-provided image and environment settings for the selected org/runtime. A pipeline
-ID is not an organization API token. Do not embed an admin API token in a workload.
-Use the deploy credential through the customer's secret delivery mechanism.
-
-For Kubernetes use `--environment Kubernetes --fleet-subtype Edge` (or the actual
-Gateway/Coordinator role). Validate both the API call and its returned validation
-result; a successful HTTP response alone does not prove valid configuration.
-
-Stop/uninstall test agents before `edx pipelines delete "$CONF_ID" --yes`.
-Deleting a pipeline does not remove cloud infrastructure or already ingested telemetry.
+Validate configurations and test representative inputs and expected outputs before
+promoting transformations. Check signal identity, value/unit, original timestamp,
+filter exclusions and unintended extra outputs. Use existing edx preview/live-capture
+capabilities; this skill does not require a bundled test runner or deployment script.

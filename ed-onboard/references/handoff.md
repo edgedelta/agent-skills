@@ -5,11 +5,12 @@ memory or temporary-directory state. Match the customer's existing IaC workflow.
 is an inventory/evidence artifact, not a required backend object or fixed execution plan.
 
 Record:
-- AWS account/profile/regions and Edge Delta org/profile separately; deployment owner
-  (Terraform, CloudFormation, GitOps or manual) and selected runtime/chart versions.
+- Environment identity/context (provider, account/project/subscription, region or hosts)
+  and Edge Delta org/profile separately; deployment owner
+  (infrastructure as code, GitOps or manual) and selected runtime/chart versions.
 - Per resource and requested signal: selected native source/path, direct-path capability
-  gaps, authorized intermediary/cost exceptions, status and remaining work. RDS engine
-  logs, native database metrics and application/client traces are separate entries.
+  gaps, authorized intermediary/cost exceptions, status and remaining work. Service/server
+  logs, infrastructure metrics and application/client traces are separate entries.
 - Immediately after creation: exact resource IDs, pipeline/environment IDs, dependencies,
   ownership (created versus preexisting), operation result and any partial failure.
 - Verification query/time range and nonsecret evidence paths; distinguish schema checks,
