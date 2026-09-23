@@ -40,38 +40,59 @@ context separate from the Edge Delta organization/profile.
 - Preserve existing collection until its replacement is verified. Retire duplicate
   paths only within scope and honor explicit retention instructions.
 
-## Adapt to the environment
+## Conversational execution flow
 
-Discover the user's chosen environment boundaries: provider/account/project/subscription,
-cluster/context, hosts, region or datacenter as applicable. Identify actual resources,
-current telemetry paths, agents and ownership. Inspect only the authorized scope; access
-denied means inaccessible, not absent. Do not create demo infrastructure merely because
-discovery returned an empty result.
+Use these stages to guide the work, not as nine mandatory approval gates. Reuse scope,
+selections and authorization already supplied; ask only for missing decisions. A request
+that already names the environment, resources and permission to deploy can proceed
+without repeating those questions. Revisit the relevant stage if discovery changes the
+available paths. No new edx command hierarchy or backend onboarding state is required.
 
-Track requested logs, metrics and traces per resource, with selected source/path,
-capability gaps, necessary exceptions and evidence/status. For a simple source this can
-be a short note rather than a formal plan. Revisit choices as discovery reveals constraints.
+1. **Identify environments.** Inspect available local tools and configured profile/context
+   names, keeping credential values private. Examples include AWS CLI, gcloud, Azure CLI,
+   kubectl, Vercel CLI and DigitalOcean doctl; this is not an exhaustive provider list.
+   Use available connectors, APIs or existing environment information too. An installed
+   tool is only a clue, not proof of authentication, available resources or authorization.
+2. **Choose discovery scope.** Present the identified environments and let the customer
+   select some or all, with account/project/subscription, region, cluster, hosts or
+   datacenter boundaries as applicable. If scope is already clear, use it. Read
+   [discovery and selection](references/discovery.md) for inventory and selection details.
+3. **Discover read-only.** Within that scope, inventory resources, existing collection,
+   agents, pipelines and deployment ownership. Identify available signals and candidate
+   integrations. Do not install agents, enable exports or change logging during discovery.
+   Record inaccessible areas separately from empty ones; do not create demo resources
+   merely because nothing was found.
+4. **Select targets.** Present concrete resources, signals, current coverage, proposed
+   collection paths, support confidence and material changes/costs. Let the customer
+   choose all or selected resources/signals, or apply an explicit constraint such as
+   direct paths only. Preserve exclusions. Discovery access does not authorize onboarding
+   everything; resource selection does not silently authorize unresolved exceptions.
+5. **Plan the selected changes.** Choose by [source capabilities](references/collection-paths.md),
+   checking the actual runtime's supported inputs, protocols, authentication and formats.
+   Describe pipeline/agent changes, permissions, network needs, ownership, rollout,
+   recurring costs, unsupported signals and rollback. Scale detail to the task; a single
+   source can use a short note. [Cloud hints](references/cloud-hints.md) are optional.
+6. **Resolve exceptions and authorization.** Settle material choices such as a required
+   paid intermediary or a change outside the original scope before applying it. Present
+   concrete changes when authorization is missing. Existing deployment authorization is
+   sufficient for covered actions; do not ask again merely because this stage exists.
+7. **Execute.** Confirm the target environment and Edge Delta organization, then apply
+   selected changes through their existing ownership tools. Reuse appropriate resources,
+   reconcile uncertain creates before retrying, and record created IDs immediately,
+   including partial failures. Deliver credentials through the customer's secret mechanism.
+8. **Verify.** Use [verification](references/verification.md) to check source receipt,
+   correct processing and indexed logs/metrics/traces for each selected resource/signal.
+   Distinguish deployment health from telemetry coverage. Report partial, blocked,
+   unsupported and unverified outcomes; do not silently expand targets to obtain a pass.
+9. **Handoff.** Summarize connected resources, pipeline IDs, chosen paths, query evidence,
+   remaining gaps and operational instructions. Keep a proportionate local
+   [inventory](references/handoff.md) when work spans sessions or creates resources.
 
-Choose by source capabilities using [collection paths](references/collection-paths.md).
-Inspect supported inputs, formats, authentication and deployment options for the actual
-Edge Delta runtime. Read [cloud hints](references/cloud-hints.md) only when relevant;
-these are optional examples, not a supported-provider list or the default workflow.
-
-Prepare and apply changes through the customer's existing ownership mechanism. Reuse
-appropriate resources, reconcile uncertain creates before retrying, and track created
-IDs immediately. Existing authorization to perform the work is sufficient; ask only for
-missing scope or an action outside it. Keep credentials out of artifacts and use the
-customer's secret-delivery mechanism for agent credentials.
-
-Verify with [verification](references/verification.md), distinguishing deployment health,
-source receipt, correct processing and indexed telemetry. Report partial coverage and
-unverified signals explicitly. Keep a proportionate [handoff](references/handoff.md) for
-work spanning sessions or involving created resources. No fixed command stages or
-backend onboarding state are required.
-
-When asked to retain a test, keep agents and workloads running. When cleanup is authorized,
-remove only owned resources in dependency order and verify residuals. Deleting a pipeline
-configuration does not uninstall its agents or delete external infrastructure.
+Retry, rollback and cleanup are conditional actions, not mandatory final stages. When
+asked to retain a test, keep agents and workloads running; do not stop them to force a
+verification flush. When cleanup is authorized, remove only owned resources in dependency
+order and verify residuals. Deleting a pipeline does not uninstall agents or remove
+external infrastructure. A verification failure alone does not override retention.
 
 ## Pipeline authoring
 

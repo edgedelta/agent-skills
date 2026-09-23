@@ -5,6 +5,9 @@ memory or temporary-directory state. Match the customer's existing IaC workflow.
 is an inventory/evidence artifact, not a required backend object or fixed execution plan.
 
 Record:
+- Discovery boundaries and completeness, selected resource IDs/signals, exclusions,
+  customer decisions, unresolved exceptions and next action. Distinguish discovered
+  candidates from targets authorized for execution.
 - Environment identity/context (provider, account/project/subscription, region or hosts)
   and Edge Delta org/profile separately; deployment owner
   (infrastructure as code, GitOps or manual) and selected runtime/chart versions.
