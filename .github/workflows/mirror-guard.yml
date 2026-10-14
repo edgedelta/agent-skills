@@ -1,0 +1,31 @@
+name: mirror-guard
+
+# This repository is a mirror: every edx release overwrites it with
+# https://github.com/edgedelta/edx/tree/main/skills. A change made here would be
+# lost on the next release, so pull requests may only touch .github/.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reject changes to mirrored files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          mirrored=$(git diff --name-only "$BASE_SHA"...HEAD | grep -v '^\.github/' || true)
+          if [ -n "$mirrored" ]; then
+            echo "::error::These skills are generated from edgedelta/edx/skills and overwritten on every edx release. Open this change as a PR against https://github.com/edgedelta/edx (skills/ directory) instead."
+            echo "Mirrored files changed in this PR:"
+            echo "$mirrored"
+            exit 1
+          fi
+          echo "Only .github/ changed; OK."
