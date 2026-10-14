@@ -4,6 +4,10 @@ Edge Delta skills for AI agents (Claude Code, Cursor, Copilot and other
 SKILL.md-compatible tools), built on the [`edx` CLI](https://github.com/edgedelta/edx)
 and Edge Delta's SDKs.
 
+> The skills are authored in [`edgedelta/edx/skills`](https://github.com/edgedelta/edx/tree/main/skills)
+> and published to [`edgedelta/agent-skills`](https://github.com/edgedelta/agent-skills)
+> on every edx release. Open issues and pull requests against edx.
+
 ## See it in action
 
 Ask your agent a root-cause question and the skills drive the investigation.
